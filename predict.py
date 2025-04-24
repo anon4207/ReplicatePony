@@ -17,7 +17,7 @@ class Predictor(BasePredictor):
         
         # Download model and LoRAs from your HuggingFace repo
         # You'll need to replace this with your actual HF repo details
-        model_path = "path-to-your-model.safetensors"
+        model_path = "https://huggingface.co/tomparisbiz/CyberRachel/blob/main/cyberrealisticPony_v8.safetensors"
         
         # Load your custom model
         self.pipe.unet.load_attn_procs(model_path)
