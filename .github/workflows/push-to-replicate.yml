@@ -17,12 +17,33 @@ jobs:
         with:
           tool-cache: false
           docker-images: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
 
-      - name: Setup Cog
-        uses: replicate/setup-cog@v1
-        with:
-          token: ${{ secrets.REPLICATE_API_TOKEN }}
+      # Install cog directly without cuda dependency
+      - name: Install Cog
+        run: |
+          sudo curl -o /usr/local/bin/cog -L https://github.com/replicate/cog/releases/latest/download/cog_$(uname -s)_$(uname -m)
+          sudo chmod +x /usr/local/bin/cog
+          cog --version
 
+      # Authenticate with Replicate using token
+      - name: Configure Replicate credentials
+        env:
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+        run: |
+          mkdir -p ~/.config
+          echo "{\"token\":\"$REPLICATE_API_TOKEN\"}" > ~/.config/replicate
+
+      # Skip CUDA installation entirely - not needed for build
+      - name: Update cog.yaml to avoid CUDA check during build
+        run: |
+          sed -i 's/gpu: true/gpu: true\n  gpu_build: false/' cog.yaml
+          cat cog.yaml
+
+      # Push to Replicate
       - name: Push to Replicate
         run: |
           cog push r8.im/anon4207/multipony
