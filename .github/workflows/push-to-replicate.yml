@@ -25,4 +25,4 @@ jobs:
       
       - name: Push to Replicate
         run: |
-          cog push r8.im/anon4207/multipony
+          cog push r8.im/your-username/cyberrealistic-pony-v8
