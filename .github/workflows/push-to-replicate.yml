@@ -29,15 +29,24 @@ jobs:
           sudo chmod +x /usr/local/bin/cog
           cog --version
 
-      # Authenticate with Replicate using token
-      - name: Configure Replicate credentials
+      # Set up proper authentication with Replicate
+      - name: Set up authentication
         env:
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
         run: |
+          # Create config directory if it doesn't exist
           mkdir -p ~/.config
+          # Write token to config file
           echo "{\"token\":\"$REPLICATE_API_TOKEN\"}" > ~/.config/replicate
+          # Also set it as an environment variable
+          echo "REPLICATE_API_TOKEN=$REPLICATE_API_TOKEN" >> $GITHUB_ENV
+          
+          # Set up Docker registry credentials
+          echo "$REPLICATE_API_TOKEN" | docker login r8.im --username=token --password-stdin || true
 
       # Push to Replicate with build args to skip CUDA check
       - name: Push to Replicate
+        env:
+          COG_SKIP_CUDA_CHECK: 1
         run: |
-          COG_SKIP_CUDA_CHECK=1 cog push r8.im/anon4207/multipony
+          cog push r8.im/anon4207/multipony
