@@ -24,9 +24,13 @@ jobs:
           sudo chmod +x /usr/local/bin/cog
           cog --version
 
-      - name: Log in to Replicate
+      - name: Configure Docker for Replicate
+        env:
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
         run: |
-          echo "${{ secrets.REPLICATE_API_TOKEN }}" | cog login
+          mkdir -p ~/.config/
+          echo '{"token":"'$REPLICATE_API_TOKEN'"}' > ~/.config/replicate
+          echo $REPLICATE_API_TOKEN | docker login --username=token --password-stdin r8.im
 
       - name: Push to Replicate
         run: |
